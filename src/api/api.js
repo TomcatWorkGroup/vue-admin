@@ -15,3 +15,11 @@ export const batchRemoveUser = params => { return axios.get(`${base}/user/batchr
 export const editUser = params => { return axios.get(`${base}/user/edit`, { params: params }); };
 
 export const addUser = params => { return axios.get(`${base}/user/add`, { params: params }); };
+
+export const getCompanyList = params => { return axios.get(`${base}/company/list`, { params: params}); };
+
+export const removeCompany = params => { return axios.get(`${base}/company/remove`, { params: params}); };
+
+export const addCompany = params => { return axios.get(`${base}/company/add`, { params: params }); };
+
+export const editCompany = params => { return axios.get(`${base}/company/edit`, { params: params }); };

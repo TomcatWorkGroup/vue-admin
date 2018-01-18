@@ -17,6 +17,7 @@ import 'font-awesome/css/font-awesome.min.css'
 Vue.use(ElementUI)
 Vue.use(VueRouter)
 Vue.use(Vuex)
+Vue.config.devtools = true; 
 
 //NProgress.configure({ showSpinner: false });
 

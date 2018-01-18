@@ -1,7 +1,11 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import { LoginUsers, Users } from './data/user';
+import { Companies } from './data/company'
+import Mock from 'mockjs';
+
 let _Users = Users;
+let _Companies = Companies;
 
 export default {
   /**
@@ -18,6 +22,79 @@ export default {
     // mock error request
     mock.onGet('/error').reply(500, {
       msg: 'failure'
+    });
+
+    //获取公司列表
+    mock.onGet('/company/list').reply(config=>{
+      let { name } = config.params;
+      
+      console.log(name);
+      
+      let companies = _Companies.filter(c=>{
+        if(name && c.name.indexOf(name) == -1) return false;
+        return true;
+      });
+      let len = companies.length;
+      return new Promise((resolve,reject)=>{
+        setTimeout(() => {
+          resolve([200,{
+            'companies':companies,
+            'total':len
+          }]);
+        }, 500);
+      });
+    });
+    //删除公司
+    mock.onGet('/company/remove').reply(config=>{    
+      let { id } = config.params;
+      console.log(id);
+      _Companies = _Companies.filter(c=>c.id !== id );
+      console.log(_Companies);
+      return new Promise((resolve,reject)=>{
+        setTimeout(() => {
+          resolve([200,{
+            code: 200,
+            msg: '删除成功'
+          }]);
+        }, 500);
+      });
+    });
+    //添加公司
+    mock.onGet('/company/add').reply(config=>{    
+      let { name,status,addr } = config.params;
+      _Companies.push({
+        id:Mock.Random.guid(),
+        name:name,
+        status:status,
+        addr:addr
+      });
+      return new Promise((resolve,reject)=>{
+        setTimeout(() => {
+          resolve([200,{
+            code: 200,
+            msg: '添加成功'
+          }]);
+        }, 500);
+      });
+    });
+    //编辑公司
+    mock.onGet('/company/edit').reply(config=>{    
+      let {id, name,status,addr } = config.params;      
+      _Companies.some(c=>{
+        if(c.id === id){
+          c.name = name,
+          c.status = status,
+          c.addr = addr
+        }
+      });
+      return new Promise((resolve,reject)=>{
+        setTimeout(() => {
+          resolve([200,{
+            code: 200,
+            msg: '编辑成功'
+          }]);
+        }, 500);
+      });
     });
 
     //登录
