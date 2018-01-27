@@ -60,42 +60,42 @@ export default {
       });
     });
     //添加公司
-    mock.onGet('/company/add').reply(config=>{    
-      let { name,status,addr } = config.params;
-      _Companies.push({
-        id:Mock.Random.guid(),
-        name:name,
-        status:status,
-        addr:addr
-      });
-      return new Promise((resolve,reject)=>{
-        setTimeout(() => {
-          resolve([200,{
-            code: 200,
-            msg: '添加成功'
-          }]);
-        }, 500);
-      });
-    });
+    // mock.onGet('/company/add').reply(config=>{    
+    //   let { name,status,addr } = config.params;
+    //   _Companies.push({
+    //     id:Mock.Random.guid(),
+    //     name:name,
+    //     status:status,
+    //     addr:addr
+    //   });
+    //   return new Promise((resolve,reject)=>{
+    //     setTimeout(() => {
+    //       resolve([200,{
+    //         code: 200,
+    //         msg: '添加成功'
+    //       }]);
+    //     }, 500);
+    //   });
+    // });
     //编辑公司
-    mock.onGet('/company/edit').reply(config=>{    
-      let {id, name,status,addr } = config.params;      
-      _Companies.some(c=>{
-        if(c.id === id){
-          c.name = name,
-          c.status = status,
-          c.addr = addr
-        }
-      });
-      return new Promise((resolve,reject)=>{
-        setTimeout(() => {
-          resolve([200,{
-            code: 200,
-            msg: '编辑成功'
-          }]);
-        }, 500);
-      });
-    });
+    // mock.onGet('/company/edit').reply(config=>{    
+    //   let {id, name,status,addr } = config.params;      
+    //   _Companies.some(c=>{
+    //     if(c.id === id){
+    //       c.name = name,
+    //       c.status = status,
+    //       c.addr = addr
+    //     }
+    //   });
+    //   return new Promise((resolve,reject)=>{
+    //     setTimeout(() => {
+    //       resolve([200,{
+    //         code: 200,
+    //         msg: '编辑成功'
+    //       }]);
+    //     }, 500);
+    //   });
+    // });
 
     //登录
     mock.onPost('/login').reply(config => {

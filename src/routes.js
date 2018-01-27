@@ -10,6 +10,10 @@ import Page5 from './views/nav2/Page5.vue'
 import Page6 from './views/nav3/Page6.vue'
 import echarts from './views/charts/echarts.vue'
 import company from './views/nav1/company.vue'
+import enterprise from './views/nav1/enterprise.vue'
+import customer from './views/nav1/customer.vue'
+import enduser from './views/nav1/enduser.vue'
+
 
 let routes = [
     {
@@ -28,14 +32,14 @@ let routes = [
     {
         path: '/',
         component: Home,
-        name: '导航一',
+        name: '组织管理',
         iconCls: 'el-icon-message',//图标样式class
         children: [
-            { path: '/main', component: Main, name: '主页', hidden: true },
-            { path: '/table', component: Table, name: 'Table' },
-            { path: '/form', component: Form, name: 'Form' },
-            { path: '/user', component: user, name: '列表' },
             { path: '/company', component: company, name: '公司' },
+            { path: '/main', component: Main, name: '主页', hidden: true },
+            { path: '/enterprise', component: enterprise, name: '企业' },
+            { path: '/customer', component: customer, name: '客户' },
+            { path: '/enduser', component: enduser, name: '终端用户' },           
         ]
     },
     {
