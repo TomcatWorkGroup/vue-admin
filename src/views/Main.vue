@@ -1,6 +1,6 @@
 <template>
 	<section>
-		main
+		欢迎您来到数据管理中心
 	</section>
 </template>
 

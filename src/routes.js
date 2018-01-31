@@ -29,10 +29,20 @@ let routes = [
     {
         path: '/',
         component: Home,
+        name: '数据管理中心',
+        iconCls: 'fa fa-group',//图标样式class
+        leaf:true,
+        hidden: true,
+        children: [
+            { path: '/', component: echarts,name: '主页', hidden: true },
+        ]
+    },
+    {
+        path: '/',
+        component: Home,
         name: '组织管理',
         iconCls: 'el-icon-message',//图标样式class
         children: [
-            { path: '/main', component: Main, name: '主页', hidden: true },
             { path: '/company', component: company, name: '公司' },            
             { path: '/enterprise', component: enterprise, name: '企业' },
             { path: '/customer', component: customer, name: '客户' },
@@ -59,15 +69,15 @@ let routes = [
             { path: '/employee', component: employee, name: '员工管理' }
         ]
     },
-    {
-        path: '/',
-        component: Home,
-        name: 'Charts',
-        iconCls: 'fa fa-bar-chart',
-        children: [
-            { path: '/echarts', component: echarts, name: 'echarts' }
-        ]
-    },
+    // {
+    //     path: '/',
+    //     component: Home,
+    //     name: 'Charts',
+    //     iconCls: 'fa fa-bar-chart',
+    //     children: [
+    //         { path: '/echarts', component: echarts, name: 'echarts' }
+    //     ]
+    // },
     {
         path: '*',
         hidden: true,
