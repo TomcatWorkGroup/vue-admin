@@ -209,11 +209,7 @@ export default {
     //显示编辑界面
     handleEdit: function(index, row) {
       this.editFormVisible = true;
-	  this.editForm = Object.assign({}, row);
-	  console.log("----------------------------------");
-	  console.log(this.editForm);
-	  console.log("----------------------------------");
-	  
+	  this.editForm = Object.assign({}, row);	  
     },
     //显示新增界面
     handleAdd: function() {

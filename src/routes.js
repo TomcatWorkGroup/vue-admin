@@ -2,17 +2,14 @@ import Login from './views/Login.vue'
 import NotFound from './views/404.vue'
 import Home from './views/Home.vue'
 import Main from './views/Main.vue'
-import Table from './views/nav1/Table.vue'
-import Form from './views/nav1/Form.vue'
-import user from './views/nav1/user.vue'
-import Page4 from './views/nav2/Page4.vue'
-import Page5 from './views/nav2/Page5.vue'
-import Page6 from './views/nav3/Page6.vue'
 import echarts from './views/charts/echarts.vue'
 import company from './views/nav1/company.vue'
 import enterprise from './views/nav1/enterprise.vue'
 import customer from './views/nav1/customer.vue'
 import enduser from './views/nav1/enduser.vue'
+import employee from './views/nav2/employee.vue'
+import device from './views/nav3/device.vue'
+import manufacturer from './views/nav3/manufacturer.vue'
 
 
 let routes = [
@@ -35,8 +32,8 @@ let routes = [
         name: '组织管理',
         iconCls: 'el-icon-message',//图标样式class
         children: [
-            { path: '/company', component: company, name: '公司' },
             { path: '/main', component: Main, name: '主页', hidden: true },
+            { path: '/company', component: company, name: '公司' },            
             { path: '/enterprise', component: enterprise, name: '企业' },
             { path: '/customer', component: customer, name: '客户' },
             { path: '/enduser', component: enduser, name: '终端用户' },           
@@ -45,21 +42,21 @@ let routes = [
     {
         path: '/',
         component: Home,
-        name: '导航二',
-        iconCls: 'fa fa-id-card-o',
+        name: '设备管理',
+        iconCls: 'fa fa-dashboard',
         children: [
-            { path: '/page4', component: Page4, name: '页面4' },
-            { path: '/page5', component: Page5, name: '页面5' }
+            { path: '/manufacturer', component: manufacturer, name: '厂商' },   
+            { path: '/device', component: device, name: '控制器' }
         ]
     },
     {
         path: '/',
         component: Home,
         name: '',
-        iconCls: 'fa fa-address-card',
-        leaf: true,//只有一个节点
+        iconCls: 'fa fa-group',//图标样式class
+        leaf:true,
         children: [
-            { path: '/page6', component: Page6, name: '导航三' }
+            { path: '/employee', component: employee, name: '员工管理' }
         ]
     },
     {
