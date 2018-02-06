@@ -7,7 +7,7 @@
 					<el-input v-model="filters.name" placeholder="公司名称"></el-input>
 				</el-form-item>
 				<el-form-item>
-					<el-button type="primary" v-on:click="getCompanies">查询</el-button>
+					<el-button type="primary" v-on:click="filterCompanies">查询</el-button>
 				</el-form-item>
 				<el-form-item>
 					<el-button type="primary" @click="handleAdd">新增</el-button>
@@ -83,167 +83,178 @@
 </template>
 
 <script>
-	import util from '../../common/js/util'
-	//import NProgress from 'nprogress'
-    import * as companyAPI  from '../../api/company';
+import util from "../../common/js/util";
+//import NProgress from 'nprogress'
+import * as companyAPI from "../../api/company";
 
-	export default {
-		data() {
-			return {
-				filters: {
-					name: ''
-				},
-				companies: [],
-				total: 0,
-				page: 1,
-				listLoading: false,
-				sels: [],//列表选中列
+export default {
+  data() {
+    return {
+      filters: {
+        name: ""
+      },
+      //源数据结构
+      sourceData: {
+        companies: []
+      },
+      companies: [],
+      total: 0,
+      page: 1,
+      listLoading: false,
+      sels: [], //列表选中列
 
-				editFormVisible: false,//编辑界面是否显示
-				editLoading: false,
-				editFormRules: {
-					companyName: [
-						{ required: true, message: '请输公司名称', trigger: 'blur' }
-					]
-				},
-				//编辑界面数据
-				editForm: {
-					id: 0,
-					companyName: '',
-					status: -1,
-					addr: ''
-				},
+      editFormVisible: false, //编辑界面是否显示
+      editLoading: false,
+      editFormRules: {
+        companyName: [
+          { required: true, message: "请输公司名称", trigger: "blur" }
+        ]
+      },
+      //编辑界面数据
+      editForm: {
+        id: 0,
+        companyName: "",
+        status: -1,
+        addr: ""
+      },
 
-				addFormVisible: false,//新增界面是否显示
-				addLoading: false,
-				addFormRules: {
-					companyName: [
-						{ required: true, message: '请输公司名称', trigger: 'blur' }
-					]
-				},
-				//新增界面数据
-				addForm: {
-					id: 0,
-					companyName: '',
-					status: -1,
-					addr: ''
-				}
+      addFormVisible: false, //新增界面是否显示
+      addLoading: false,
+      addFormRules: {
+        companyName: [
+          { required: true, message: "请输公司名称", trigger: "blur" }
+        ]
+      },
+      //新增界面数据
+      addForm: {
+        id: 0,
+        companyName: "",
+        status: -1,
+        addr: ""
+      }
+    };
+  },
+  methods: {
+    formatStatus: function(row, column) {
+      return row.status == 1 ? "启用" : "禁用";
+    },
+    handleCurrentChange(val) {
+      this.page = val;
+      this.getCompanies();
+    },
+    //获取公司列表
+    getCompanies() {
+      let para = {
+        page: this.page,
+        companyName: this.filters.name
+      };
+      this.listLoading = true;
+      companyAPI.getCompanyList(para).then(res => {
+        this.sourceData.companies = res.data;
+        this.companies = this.sourceData.companies;
+        this.total = this.companies.length;
+        this.listLoading = false;
+      });
+    },
+    //过滤企业
+    filterCompanies() {
+      let name = this.filters.name;
+      this.companies = this.sourceData.companies.filter(item => {
+        if (name && -1 === item.companyName.indexOf(name)) return false;
+        return true;
+      });
+    },
+    //删除
+    handleDel: function(index, row) {
+      this.$confirm("确认删除该记录吗?", "提示", {
+        type: "warning"
+      })
+        .then(() => {
+          this.listLoading = true;
+          //NProgress.start();
+          let para = { id: row.id, name: "" };
+          companyAPI.removeCompany(para).then(res => {
+            this.listLoading = false;
+            //NProgress.done();
+            this.$message({
+              message: "删除成功",
+              type: "success"
+            });
+            this.getCompanies();
+          });
+        })
+        .catch(() => {});
+    },
+    //显示编辑界面
+    handleEdit: function(index, row) {
+      this.editFormVisible = true;
+      this.editForm = Object.assign({}, row);
+    },
+    //显示新增界面
+    handleAdd: function() {
+      this.addFormVisible = true;
+      this.addForm = {
+        companyName: "",
+        status: -1,
+        addr: ""
+      };
+    },
+    //编辑
+    editSubmit: function() {
+      this.$refs.editForm.validate(valid => {
+        if (valid) {
+          this.$confirm("确认提交吗？", "提示", {}).then(() => {
+            this.editLoading = true;
+            //NProgress.start();
+            let para = Object.assign({}, this.editForm);
+            console.log(para);
 
-			}
-		},
-		methods: {
-            formatStatus: function (row, column) {
-				return row.status == 1 ? '启用' : '禁用';
-			},
-			handleCurrentChange(val) {
-				this.page = val;
-				this.getCompanies();
-			},
-			//获取公司列表
-			getCompanies() {
-				let para = {
-					page: this.page,
-					companyName: this.filters.name
-				};
-				this.listLoading = true;
-				companyAPI.getCompanyList(para).then((res) => {
-					this.companies = res.data;//.companies;
-					this.total = this.companies.length;
-					this.listLoading = false;
-				});
-			},
-			//删除
-			handleDel: function (index, row) {
-				this.$confirm('确认删除该记录吗?', '提示', {
-					type: 'warning'
-				}).then(() => {
-					this.listLoading = true;
-					//NProgress.start();
-					let para = { id: row.id ,name:''};
-					companyAPI.removeCompany(para).then((res) => {
-						this.listLoading = false;
-						//NProgress.done();
-						this.$message({
-							message: '删除成功',
-							type: 'success'
-						});
-						this.getCompanies();
-					});
-				}).catch(() => {
-
-				});
-			},
-			//显示编辑界面
-			handleEdit: function (index, row) {
-				this.editFormVisible = true;
-				this.editForm = Object.assign({}, row);
-			},
-			//显示新增界面
-			handleAdd: function () {
-				this.addFormVisible = true;
-				this.addForm = {
-					companyName: '',
-					status: -1,
-					addr: ''
-				};
-			},
-			//编辑
-			editSubmit: function () {
-				this.$refs.editForm.validate((valid) => {
-					if (valid) {
-						this.$confirm('确认提交吗？', '提示', {}).then(() => {
-							this.editLoading = true;
-							//NProgress.start();
-                            let para = Object.assign({}, this.editForm);
-                            console.log(para);
-                            
-							companyAPI.editCompany(para).then((res) => {
-								this.editLoading = false;
-								//NProgress.done();
-								this.$message({
-									message: '提交成功',
-									type: 'success'
-								});
-								this.$refs['editForm'].resetFields();
-								this.editFormVisible = false;
-								this.getCompanies();
-							});
-						});
-					}
-				});
-			},
-			//新增
-			addSubmit: function () {
-				this.$refs.addForm.validate((valid) => {
-					if (valid) {
-						this.$confirm('确认提交吗？', '提示', {}).then(() => {
-							this.addLoading = true;
-							//NProgress.start();
-							let para = Object.assign({}, this.addForm);
-							companyAPI.addCompany(para).then((res) => {
-								this.addLoading = false;
-								//NProgress.done();
-								this.$message({
-									message: '提交成功',
-									type: 'success'
-								});
-								this.$refs['addForm'].resetFields();
-								this.addFormVisible = false;
-								this.getCompanies();
-							});
-						});
-					}
-				});
-			},
-			selsChange: function (sels) {
-				this.sels = sels;
-			}
-		},
-		mounted() {
-			this.getCompanies();
-		}
-	}
-
+            companyAPI.editCompany(para).then(res => {
+              this.editLoading = false;
+              //NProgress.done();
+              this.$message({
+                message: "提交成功",
+                type: "success"
+              });
+              this.$refs["editForm"].resetFields();
+              this.editFormVisible = false;
+              this.getCompanies();
+            });
+          });
+        }
+      });
+    },
+    //新增
+    addSubmit: function() {
+      this.$refs.addForm.validate(valid => {
+        if (valid) {
+          this.$confirm("确认提交吗？", "提示", {}).then(() => {
+            this.addLoading = true;
+            //NProgress.start();
+            let para = Object.assign({}, this.addForm);
+            companyAPI.addCompany(para).then(res => {
+              this.addLoading = false;
+              //NProgress.done();
+              this.$message({
+                message: "提交成功",
+                type: "success"
+              });
+              this.$refs["addForm"].resetFields();
+              this.addFormVisible = false;
+              this.getCompanies();
+            });
+          });
+        }
+      });
+    },
+    selsChange: function(sels) {
+      this.sels = sels;
+    }
+  },
+  mounted() {
+    this.getCompanies();
+  }
+};
 </script>
 
 <style scoped>

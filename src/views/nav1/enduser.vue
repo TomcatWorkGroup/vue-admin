@@ -7,7 +7,7 @@
 					<el-input v-model="filters.name" placeholder="终端用户名称"></el-input>
 				</el-form-item>
 				<el-form-item>
-					<el-button type="primary" v-on:click="getEndUsers">查询</el-button>
+					<el-button type="primary" v-on:click="filterEndUsers">查询</el-button>
 				</el-form-item>
 				<el-form-item>
 					<el-button type="primary" @click="handleAdd">新增</el-button>
@@ -134,20 +134,23 @@
 <script>
 import util from "../../common/js/util";
 //import NProgress from 'nprogress'
-import * as enduserAPI from "../../api/enduser"
+import * as enduserAPI from "../../api/enduser";
 import * as customerAPI from "../../api/customer";
 import * as enterpriseAPI from "../../api/enterprise";
-import { removeCustomer } from '../../api/customer';
+import { removeCustomer } from "../../api/customer";
 
 export default {
   data() {
     return {
       filters: {
         name: ""
-	  },
-	  endusers:[],
+      },
+      sourceData: {
+        endusers: []
+      },
+      endusers: [],
       customers: [],
-	  enterprises: [],
+      enterprises: [],
       total: 0,
       page: 1,
       listLoading: false,
@@ -162,10 +165,10 @@ export default {
       },
       //编辑界面数据
       editForm: {
-		id: 0,
-		endUserName:"",
-		customerId: 0,
-		enterpriseId:0,
+        id: 0,
+        endUserName: "",
+        customerId: 0,
+        enterpriseId: 0,
         status: -1
       },
 
@@ -179,35 +182,33 @@ export default {
       //新增界面数据
       addForm: {
         id: 0,
-        endUserName:"",
-		customerId: '',
-		enterpriseId:'',
+        endUserName: "",
+        customerId: "",
+        enterpriseId: "",
         status: -1
       }
     };
   },
   methods: {
-	selectChange: function(v){
-		// this.customers = this.customers.filters(c=>{
-		// 	//if(c.enterpriseId === v) return true;
-		// 	return false;
-		// });		
-	},
+    selectChange: function(v) {
+      // this.customers = this.customers.filters(c=>{
+      // 	//if(c.enterpriseId === v) return true;
+      // 	return false;
+      // });
+    },
     formatStatus: function(row, column) {
       return row.status == 1 ? "启用" : "禁用";
-	},
-	formatEnterprise: function(row, column) {
-		let eps = this.enterprises.find((value,index,arr)=>{
-			if(row.enterpriseId === value.id)
-				return true;
-		});
+    },
+    formatEnterprise: function(row, column) {
+      let eps = this.enterprises.find((value, index, arr) => {
+        if (row.enterpriseId === value.id) return true;
+      });
       return undefined == eps ? "未知" : eps.enterpriseName;
-	},
-	formatCustomer: function(row, column) {
-		let cus = this.customers.find((value,index,arr)=>{
-			if(row.customerId === value.id)
-				return true;
-		});
+    },
+    formatCustomer: function(row, column) {
+      let cus = this.customers.find((value, index, arr) => {
+        if (row.customerId === value.id) return true;
+      });
       return undefined == cus ? "未知" : cus.customerName;
     },
     handleCurrentChange(val) {
@@ -222,23 +223,31 @@ export default {
       };
       this.listLoading = true;
       return enduserAPI.getEndUserList(para).then(res => {
-        this.endusers = res.data;
+        this.sourceData.endusers = res.data;
+        this.endusers = this.sourceData.endusers;
         this.total = this.endusers.length;
         this.listLoading = false;
+      });
+    },
+    filterEndUsers() {
+      let name = this.filters.name;
+      this.endusers = this.sourceData.endusers.filter(item => {
+        if (name && -1 === item.endUserName.indexOf(name)) return false;
+        return true;
       });
     },
     //显示编辑界面
     handleEdit: function(index, row) {
       this.editFormVisible = true;
-	  this.editForm = Object.assign({}, row);	  
+      this.editForm = Object.assign({}, row);
     },
     //显示新增界面
     handleAdd: function() {
       this.addFormVisible = true;
       this.addForm = {
-		endUserName: "",
-		enterpriseId:"",
-		customerId:"",
+        endUserName: "",
+        enterpriseId: "",
+        customerId: "",
         status: -1
       };
     },
@@ -274,9 +283,9 @@ export default {
           this.$confirm("确认提交吗？", "提示", {}).then(() => {
             this.addLoading = true;
             //NProgress.start();
-			let para = Object.assign({}, this.addForm);
-			console.log(para);
-			
+            let para = Object.assign({}, this.addForm);
+            console.log(para);
+
             enduserAPI.addEndUser(para).then(res => {
               this.addLoading = false;
               //NProgress.done();
@@ -297,14 +306,14 @@ export default {
     }
   },
   mounted() {
-	let para = {status:enterpriseAPI.EnterpriseStatus_Enable};
-	enterpriseAPI.getEnterpriseListByStatus(para).then(res => {
-		this.enterprises = res.data;
-	});
-	customerAPI.getCustomerList().then(res=>{
-		this.customers = res.data;
-	});
-	this.getEndUsers();
+    let para = { status: enterpriseAPI.EnterpriseStatus_Enable };
+    enterpriseAPI.getEnterpriseListByStatus(para).then(res => {
+      this.enterprises = res.data;
+    });
+    customerAPI.getCustomerList().then(res => {
+      this.customers = res.data;
+    });
+    this.getEndUsers();
   }
 };
 </script>

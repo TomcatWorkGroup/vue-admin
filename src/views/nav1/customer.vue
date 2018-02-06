@@ -7,7 +7,7 @@
 					<el-input v-model="filters.name" placeholder="客户名称"></el-input>
 				</el-form-item>
 				<el-form-item>
-					<el-button type="primary" v-on:click="getCustomers">查询</el-button>
+					<el-button type="primary" v-on:click="filterCustomers">查询</el-button>
 				</el-form-item>
 				<el-form-item>
 					<el-button type="primary" @click="handleAdd">新增</el-button>
@@ -116,8 +116,11 @@ export default {
       filters: {
         name: ""
       },
+      sourceData:{
+        customers:[]
+      },
       customers: [],
-	  enterprises: [],
+      enterprises: [],
       total: 0,
       page: 1,
       listLoading: false,
@@ -133,8 +136,8 @@ export default {
       //编辑界面数据
       editForm: {
         id: 0,
-		customerName: "",
-		enterpriseId:0,
+        customerName: "",
+        enterpriseId: 0,
         status: -1
       },
 
@@ -149,23 +152,22 @@ export default {
       addForm: {
         id: 0,
         customerName: "",
-		enterpriseId:0,
+        enterpriseId: 0,
         status: -1
       }
     };
   },
   methods: {
-	selectChange: function(v){
-		console.log(v);		
-	},
+    selectChange: function(v) {
+      console.log(v);
+    },
     formatStatus: function(row, column) {
       return row.status == 1 ? "启用" : "禁用";
-	},
-	formatEnterprise: function(row, column) {
-		let eps = this.enterprises.find((value,index,arr)=>{
-			if(row.enterpriseId === value.id)
-				return true;
-		});
+    },
+    formatEnterprise: function(row, column) {
+      let eps = this.enterprises.find((value, index, arr) => {
+        if (row.enterpriseId === value.id) return true;
+      });
       return undefined == eps ? "未知" : eps.enterpriseName;
     },
     handleCurrentChange(val) {
@@ -180,9 +182,17 @@ export default {
       };
       this.listLoading = true;
       customerAPI.getCustomerList(para).then(res => {
-        this.customers = res.data;
+        this.sourceData.customers = res.data;
+        this.customers = this.sourceData.customers;
         this.total = this.customers.length;
         this.listLoading = false;
+      });
+    },
+    filterCustomers() {
+      let name = this.filters.name;
+      this.customers = this.sourceData.customers.filter(item => {
+        if (name && -1 === item.customerName.indexOf(name)) return false;
+        return true;
       });
     },
     //删除
@@ -209,14 +219,14 @@ export default {
     //显示编辑界面
     handleEdit: function(index, row) {
       this.editFormVisible = true;
-	  this.editForm = Object.assign({}, row);	  
+      this.editForm = Object.assign({}, row);
     },
     //显示新增界面
     handleAdd: function() {
       this.addFormVisible = true;
       this.addForm = {
-		customerName: "",
-		enterpriseId:"",
+        customerName: "",
+        enterpriseId: "",
         status: -1
       };
     },
@@ -252,9 +262,9 @@ export default {
           this.$confirm("确认提交吗？", "提示", {}).then(() => {
             this.addLoading = true;
             //NProgress.start();
-			let para = Object.assign({}, this.addForm);
-			console.log(para);
-			
+            let para = Object.assign({}, this.addForm);
+            console.log(para);
+
             customerAPI.addCustomer(para).then(res => {
               this.addLoading = false;
               //NProgress.done();
@@ -275,15 +285,14 @@ export default {
     }
   },
   mounted() {
-	this.getCustomers();
-	this.listLoading = true;
-	let para = {status:enterpriseAPI.EnterpriseStatus_Enable};
-	enterpriseAPI.getEnterpriseListByStatus(para).then(res => {
-		
-		console.log(res.data);
-		this.enterprises = res.data;
-		this.listLoading = false;
-	});
+    this.getCustomers();
+    this.listLoading = true;
+    let para = { status: enterpriseAPI.EnterpriseStatus_Enable };
+    enterpriseAPI.getEnterpriseListByStatus(para).then(res => {
+      console.log(res.data);
+      this.enterprises = res.data;
+      this.listLoading = false;
+    });
   }
 };
 </script>

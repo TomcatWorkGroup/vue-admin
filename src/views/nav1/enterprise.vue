@@ -7,7 +7,7 @@
 					<el-input v-model="filters.name" placeholder="企业名称"></el-input>
 				</el-form-item>
 				<el-form-item>
-					<el-button type="primary" v-on:click="getEnterprise">查询</el-button>
+					<el-button type="primary" v-on:click="filterEnterprise">查询</el-button>
 				</el-form-item>
 				<el-form-item>
 					<el-button type="primary" @click="handleAdd">新增</el-button>
@@ -87,6 +87,10 @@ export default {
       filters: {
         name: ""
       },
+      //源数据结构
+      sourceData:{
+        enterprise:[]
+      },
       enterprise: [],
       total: 0,
       page: 1,
@@ -130,17 +134,26 @@ export default {
       this.page = val;
       this.getEnterprise();
     },
-    //获取公司列表
+    //获取企业列表
     getEnterprise() {
-      let para = {
-        page: this.page,
-        enterpriseName: this.filters.name
-      };
+      // let para = {
+      //   page: this.page,
+      //   enterpriseName: this.filters.name
+      // };
       this.listLoading = true;
-      enterpriseAPI.getEnterpriseList(para).then(res => {
-        this.enterprise = res.data; //.companies;
+      enterpriseAPI.getEnterpriseList().then(res => {
+        this.sourceData.enterprise = res.data;
+        this.enterprise = this.sourceData.enterprise;
         this.total = this.enterprise.length;
         this.listLoading = false;
+      });
+    },
+    //过滤企业
+    filterEnterprise(){
+      let name = this.filters.name;
+      this.enterprise = this.sourceData.enterprise.filter(item=>{
+        if(name && -1 === item.enterpriseName.indexOf(name)) return false;
+        return true;
       });
     },
     //删除
